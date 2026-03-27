@@ -24,8 +24,6 @@
 
 namespace local_coursedateshiftpro\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Shared renderer for preview HTML used by the page and AJAX responses.
  */
@@ -39,7 +37,12 @@ class preview_renderer {
      * @param bool $postapplystate
      * @return string
      */
-    public static function render_preview(array $preview, array $filters, array $selecteditemkeys, bool $postapplystate = false): string {
+    public static function render_preview(
+        array $preview,
+        array $filters,
+        array $selecteditemkeys,
+        bool $postapplystate = false
+    ): string {
         $selectedlookup = array_flip($selecteditemkeys ?: array_keys($preview['items']));
         $autoscheduleenabled = !empty($preview['autoschedule']['enabled']);
         $showautoschedule = !empty($preview['autoschedule']['available']);
@@ -47,17 +50,40 @@ class preview_renderer {
         $deltaindays = (int)round(((int)$preview['newstartdate'] - (int)$preview['oldstartdate']) / DAYSECS);
         $courseenddates = self::extract_course_end_dates($preview);
         $html = \html_writer::start_div('coursedateshiftpro-preview cdsp-mode-simple');
-        $html .= \html_writer::tag('h3', get_string('previewtitle', 'local_coursedateshiftpro'), ['class' => 'coursedateshiftpro-preview__title']);
+        $html .= \html_writer::tag(
+            'h3',
+            get_string('previewtitle', 'local_coursedateshiftpro'),
+            ['class' => 'coursedateshiftpro-preview__title']
+        );
 
         $summaryrows = [
             get_string('previewcourse', 'local_coursedateshiftpro') => s($preview['coursename'] ?? ''),
             get_string('previeworiginaldates', 'local_coursedateshiftpro') =>
-                \html_writer::tag('div', s(get_string('previeworiginalstart', 'local_coursedateshiftpro')) . ': ' . userdate((int)$preview['oldstartdate'])) .
-                \html_writer::tag('div', s(get_string('previeworiginalend', 'local_coursedateshiftpro')) . ': ' . self::format_preview_date($courseenddates['current']), ['style' => 'margin-top:4px;']),
+                \html_writer::tag(
+                    'div',
+                    s(get_string('previeworiginalstart', 'local_coursedateshiftpro')) .
+                        ': ' . userdate((int)$preview['oldstartdate'])
+                ) .
+                \html_writer::tag(
+                    'div',
+                    s(get_string('previeworiginalend', 'local_coursedateshiftpro')) .
+                        ': ' . self::format_preview_date($courseenddates['current']),
+                    ['style' => 'margin-top:4px;']
+                ),
             get_string('previewnewdates', 'local_coursedateshiftpro') =>
-                \html_writer::tag('div', s(get_string('previewnewstart', 'local_coursedateshiftpro')) . ': ' . userdate((int)$preview['newstartdate'])) .
-                \html_writer::tag('div', s(get_string('previewnewend', 'local_coursedateshiftpro')) . ': ' . self::format_preview_date($courseenddates['new']), ['style' => 'margin-top:4px;']),
-            get_string('previewdelta', 'local_coursedateshiftpro') => get_string('previewdeltadays', 'local_coursedateshiftpro', $deltaindays),
+                \html_writer::tag(
+                    'div',
+                    s(get_string('previewnewstart', 'local_coursedateshiftpro')) .
+                        ': ' . userdate((int)$preview['newstartdate'])
+                ) .
+                \html_writer::tag(
+                    'div',
+                    s(get_string('previewnewend', 'local_coursedateshiftpro')) .
+                        ': ' . self::format_preview_date($courseenddates['new']),
+                    ['style' => 'margin-top:4px;']
+                ),
+            get_string('previewdelta', 'local_coursedateshiftpro') =>
+                get_string('previewdeltadays', 'local_coursedateshiftpro', $deltaindays),
         ];
 
         $html .= \html_writer::start_div('coursedateshiftpro-preview__summary');
@@ -88,8 +114,16 @@ class preview_renderer {
                 'action' => (new \moodle_url('/local/coursedateshiftpro/index.php'))->out(false),
             ]);
             $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
-            $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'courseid', 'value' => (int)$preview['courseid']]);
-            $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'newstartts', 'value' => (int)$preview['newstartdate']]);
+            $html .= \html_writer::empty_tag('input', [
+                'type' => 'hidden',
+                'name' => 'courseid',
+                'value' => (int)$preview['courseid'],
+            ]);
+            $html .= \html_writer::empty_tag('input', [
+                'type' => 'hidden',
+                'name' => 'newstartts',
+                'value' => (int)$preview['newstartdate'],
+            ]);
             $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'filtersinitialised', 'value' => 1]);
             foreach ($filters as $key => $value) {
                 if (empty($value)) {
@@ -139,19 +173,29 @@ class preview_renderer {
         );
         $html .= \html_writer::end_div();
 
-        $html .= \html_writer::tag('p', s(get_string('simpleviewhelp', 'local_coursedateshiftpro')), ['class' => 'cdsp-table-help cdsp-simple-only']);
-        $html .= \html_writer::tag('p', s(get_string('previewtablehelp', 'local_coursedateshiftpro')), ['class' => 'cdsp-table-help cdsp-advanced-only']);
+        $html .= \html_writer::tag(
+            'p',
+            s(get_string('simpleviewhelp', 'local_coursedateshiftpro')),
+            ['class' => 'cdsp-table-help cdsp-simple-only']
+        );
+        $html .= \html_writer::tag(
+            'p',
+            s(get_string('previewtablehelp', 'local_coursedateshiftpro')),
+            ['class' => 'cdsp-table-help cdsp-advanced-only']
+        );
         $html .= self::render_review_table($preview, $selectedlookup, $postapplystate);
 
         if (!$postapplystate) {
             $html .= \html_writer::tag(
                 'label',
-                '<input type="checkbox" name="confirmapply" value="1"> ' . s(get_string('confirmapplylabel', 'local_coursedateshiftpro')),
+                '<input type="checkbox" name="confirmapply" value="1"> ' .
+                    s(get_string('confirmapplylabel', 'local_coursedateshiftpro')),
                 ['class' => 'cdsp-form-check']
             );
             $html .= \html_writer::tag(
                 'label',
-                '<input type="checkbox" name="acknowledgealerts" value="1"> ' . s(get_string('acknowledgealertslabel', 'local_coursedateshiftpro')),
+                '<input type="checkbox" name="acknowledgealerts" value="1"> ' .
+                    s(get_string('acknowledgealertslabel', 'local_coursedateshiftpro')),
                 ['class' => 'cdsp-form-check']
             );
             if ($showautoschedule) {
@@ -207,8 +251,16 @@ class preview_renderer {
         ];
 
         $html = \html_writer::start_div('cdsp-weekly-load');
-        $html .= \html_writer::tag('h4', get_string('weeklyloadtitle', 'local_coursedateshiftpro'), ['class' => 'cdsp-weekly-load__title']);
-        $html .= \html_writer::tag('p', s(get_string('weeklyloadhelp', 'local_coursedateshiftpro')), ['class' => 'cdsp-weekly-load__help']);
+        $html .= \html_writer::tag(
+            'h4',
+            get_string('weeklyloadtitle', 'local_coursedateshiftpro'),
+            ['class' => 'cdsp-weekly-load__title']
+        );
+        $html .= \html_writer::tag(
+            'p',
+            s(get_string('weeklyloadhelp', 'local_coursedateshiftpro')),
+            ['class' => 'cdsp-weekly-load__help']
+        );
 
         $html .= \html_writer::start_div('cdsp-weekly-load__summary');
         foreach ($summary as $label => $value) {
@@ -307,15 +359,25 @@ class preview_renderer {
 
         $html = \html_writer::start_div('cdsp-decision-panel');
         $html .= \html_writer::start_div('cdsp-decision-panel__hero');
-        $html .= \html_writer::tag('div', s(get_string('decisionpaneltitle', 'local_coursedateshiftpro')), ['class' => 'cdsp-decision-panel__eyebrow']);
+        $html .= \html_writer::tag(
+            'div',
+            s(get_string('decisionpaneltitle', 'local_coursedateshiftpro')),
+            ['class' => 'cdsp-decision-panel__eyebrow']
+        );
         $html .= \html_writer::tag('h4', s($state['headline']), ['class' => 'cdsp-decision-panel__headline']);
         $html .= \html_writer::tag('p', s($state['message']), ['class' => 'cdsp-decision-panel__message']);
         $html .= \html_writer::end_div();
 
         $html .= \html_writer::start_div('cdsp-decision-panel__grid');
         $cards = [
-            ['label' => get_string('decisionpanelcourseweeks', 'local_coursedateshiftpro'), 'value' => (int)($weeklyload['totalweeks'] ?? 0)],
-            ['label' => get_string('decisionpanelmilestones', 'local_coursedateshiftpro'), 'value' => (int)($weeklyload['scheduleddates'] ?? 0)],
+            [
+                'label' => get_string('decisionpanelcourseweeks', 'local_coursedateshiftpro'),
+                'value' => (int)($weeklyload['totalweeks'] ?? 0),
+            ],
+            [
+                'label' => get_string('decisionpanelmilestones', 'local_coursedateshiftpro'),
+                'value' => (int)($weeklyload['scheduleddates'] ?? 0),
+            ],
             ['label' => get_string('decisionpanelweekreview', 'local_coursedateshiftpro'), 'value' => $state['reviewweek']],
             ['label' => get_string('decisionpanelnextaction', 'local_coursedateshiftpro'), 'value' => $state['nextaction']],
         ];
@@ -366,15 +428,39 @@ class preview_renderer {
         }
 
         $html = \html_writer::start_div('cdsp-readiness');
-        $html .= \html_writer::tag('h4', get_string('readinesstitle', 'local_coursedateshiftpro'), ['class' => 'cdsp-readiness__title']);
-        $html .= \html_writer::tag('p', s(get_string('readinesshelp', 'local_coursedateshiftpro')), ['class' => 'cdsp-readiness__help']);
+        $html .= \html_writer::tag(
+            'h4',
+            get_string('readinesstitle', 'local_coursedateshiftpro'),
+            ['class' => 'cdsp-readiness__title']
+        );
+        $html .= \html_writer::tag(
+            'p',
+            s(get_string('readinesshelp', 'local_coursedateshiftpro')),
+            ['class' => 'cdsp-readiness__help']
+        );
         $html .= \html_writer::start_div('cdsp-readiness__grid');
 
         $cards = [
-            ['label' => get_string('readinessconflicts', 'local_coursedateshiftpro'), 'value' => $summary['conflicts'], 'class' => 'is-conflict'],
-            ['label' => get_string('readinessreview', 'local_coursedateshiftpro'), 'value' => $summary['review'], 'class' => 'is-review'],
-            ['label' => get_string('readinesssuggested', 'local_coursedateshiftpro'), 'value' => $summary['suggested'], 'class' => 'is-suggested'],
-            ['label' => get_string('readinessready', 'local_coursedateshiftpro'), 'value' => $summary['ready'], 'class' => 'is-ready'],
+            [
+                'label' => get_string('readinessconflicts', 'local_coursedateshiftpro'),
+                'value' => $summary['conflicts'],
+                'class' => 'is-conflict',
+            ],
+            [
+                'label' => get_string('readinessreview', 'local_coursedateshiftpro'),
+                'value' => $summary['review'],
+                'class' => 'is-review',
+            ],
+            [
+                'label' => get_string('readinesssuggested', 'local_coursedateshiftpro'),
+                'value' => $summary['suggested'],
+                'class' => 'is-suggested',
+            ],
+            [
+                'label' => get_string('readinessready', 'local_coursedateshiftpro'),
+                'value' => $summary['ready'],
+                'class' => 'is-ready',
+            ],
         ];
 
         foreach ($cards as $card) {
@@ -494,8 +580,16 @@ class preview_renderer {
             foreach (($item['entries'] ?? []) as $entry) {
                 $datevalue = (int)($entry[$field] ?? 0);
                 $html .= \html_writer::start_div('coursedateshiftpro-timeline__field');
-                $html .= \html_writer::tag('div', s($entry['fieldlabel'] ?? ''), ['class' => 'coursedateshiftpro-timeline__field-label']);
-                $html .= \html_writer::tag('div', self::format_preview_date($datevalue), ['class' => 'coursedateshiftpro-timeline__field-date']);
+                $html .= \html_writer::tag(
+                    'div',
+                    s($entry['fieldlabel'] ?? ''),
+                    ['class' => 'coursedateshiftpro-timeline__field-label']
+                );
+                $html .= \html_writer::tag(
+                    'div',
+                    self::format_preview_date($datevalue),
+                    ['class' => 'coursedateshiftpro-timeline__field-date']
+                );
                 $html .= \html_writer::end_div();
             }
             $html .= \html_writer::end_div();
@@ -536,7 +630,7 @@ class preview_renderer {
     /**
      * Renders an editable datetime-local input for recommended dates.
      *
-     * @param string $key
+     * @param array $item
      * @param int $timestamp
      * @return string
      */
@@ -590,7 +684,7 @@ class preview_renderer {
         }
 
         $items = array_values($grouped);
-        usort($items, static function(array $a, array $b): int {
+        usort($items, static function (array $a, array $b): int {
             $left = self::timeline_group_sort_value($a);
             $right = self::timeline_group_sort_value($b);
             return $left <=> $right;
@@ -658,7 +752,8 @@ class preview_renderer {
         }
 
         $html .= \html_writer::start_tag('details', [
-            'style' => 'margin:0 0 14px;padding:12px 14px;border-left:4px solid #b42318;background:#fff5f5;color:#7f1d1d;border-radius:8px;',
+            'style' => 'margin:0 0 14px;padding:12px 14px;border-left:4px solid #b42318;' .
+                'background:#fff5f5;color:#7f1d1d;border-radius:8px;',
         ]);
         $html .= \html_writer::tag(
             'summary',
@@ -748,17 +843,19 @@ class preview_renderer {
         ]);
         $html .= \html_writer::start_tag('thead');
         $html .= \html_writer::start_tag('tr');
-        foreach ([
-            get_string('previewweekcolumn', 'local_coursedateshiftpro'),
-            get_string('previewitem', 'local_coursedateshiftpro'),
-            get_string('previewstatuscolumn', 'local_coursedateshiftpro'),
-            get_string('previewfield', 'local_coursedateshiftpro'),
-            get_string('previewadvisoriescolumn', 'local_coursedateshiftpro'),
-            get_string('previewcurrentcolumn', 'local_coursedateshiftpro'),
-            get_string('previewnewcolumn', 'local_coursedateshiftpro'),
-            get_string('previewrecommendedcolumn', 'local_coursedateshiftpro'),
-            get_string('actions'),
-        ] as $index => $heading) {
+        foreach (
+            [
+                get_string('previewweekcolumn', 'local_coursedateshiftpro'),
+                get_string('previewitem', 'local_coursedateshiftpro'),
+                get_string('previewstatuscolumn', 'local_coursedateshiftpro'),
+                get_string('previewfield', 'local_coursedateshiftpro'),
+                get_string('previewadvisoriescolumn', 'local_coursedateshiftpro'),
+                get_string('previewcurrentcolumn', 'local_coursedateshiftpro'),
+                get_string('previewnewcolumn', 'local_coursedateshiftpro'),
+                get_string('previewrecommendedcolumn', 'local_coursedateshiftpro'),
+                get_string('actions'),
+            ] as $index => $heading
+        ) {
             $classes = [];
             if (in_array($index, [4, 5], true)) {
                 $classes[] = 'cdsp-advanced-only-cell';
@@ -766,7 +863,8 @@ class preview_renderer {
             $html .= \html_writer::tag('th', s($heading), [
                 'scope' => 'col',
                 'class' => implode(' ', $classes),
-                'style' => 'white-space:nowrap;padding:12px 14px;background:#f8f9fa;border-bottom:1px solid #d8dee4;font-weight:700;color:#1f2937;',
+                'style' => 'white-space:nowrap;padding:12px 14px;background:#f8f9fa;' .
+                    'border-bottom:1px solid #d8dee4;font-weight:700;color:#1f2937;',
             ]);
         }
         $html .= \html_writer::end_tag('tr');
@@ -809,22 +907,40 @@ class preview_renderer {
             $html .= \html_writer::tag('td', self::render_week_badge((int)$group['weeknumber']), ['class' => 'cdsp-review-week']);
             $html .= \html_writer::tag('td', $itemtext, ['class' => 'cdsp-review-item']);
             $html .= \html_writer::tag('td', self::render_status_badge($group['status']));
-            $html .= \html_writer::tag('td', s(implode(', ', array_slice($group['fields'], 0, 3))) . (count($group['fields']) > 3 ? ' +' . (count($group['fields']) - 3) : ''));
+            $fieldsummary = s(implode(', ', array_slice($group['fields'], 0, 3)));
+            if (count($group['fields']) > 3) {
+                $fieldsummary .= ' +' . (count($group['fields']) - 3);
+            }
+            $html .= \html_writer::tag('td', $fieldsummary);
             $html .= \html_writer::tag('td', self::render_advisories_cell($group['summaryadvisories']));
-            $html .= \html_writer::tag('td', self::format_compact_preview_date((int)$group['currentts']), ['class' => 'cdsp-date-compact cdsp-advanced-only-cell']);
-            $html .= \html_writer::tag('td', self::format_compact_preview_date((int)$group['newts']), ['class' => 'cdsp-date-compact cdsp-advanced-only-cell']);
-            $html .= \html_writer::tag('td', self::format_compact_preview_date((int)$group['recommendedts']), ['class' => 'cdsp-date-compact']);
-            $togglebutton = \html_writer::tag('button',
+            $html .= \html_writer::tag(
+                'td',
+                self::format_compact_preview_date((int)$group['currentts']),
+                ['class' => 'cdsp-date-compact cdsp-advanced-only-cell']
+            );
+            $html .= \html_writer::tag(
+                'td',
+                self::format_compact_preview_date((int)$group['newts']),
+                ['class' => 'cdsp-date-compact cdsp-advanced-only-cell']
+            );
+            $html .= \html_writer::tag(
+                'td',
+                self::format_compact_preview_date((int)$group['recommendedts']),
+                ['class' => 'cdsp-date-compact']
+            );
+            $togglebutton = \html_writer::tag(
+                'button',
                 \html_writer::tag('span', '', ['class' => 'icon fa fa-chevron-down fa-fw', 'aria-hidden' => 'true']) .
                 \html_writer::tag('span', s(get_string('show')), ['class' => 'accesshide']),
                 [
-                'type' => 'button',
-                'class' => 'cdsp-review-toggle btn btn-icon',
-                'data-target' => $groupid,
-                'aria-expanded' => 'false',
-                'title' => get_string('show'),
-                'style' => 'padding:6px 8px;min-width:36px;',
-            ]);
+                    'type' => 'button',
+                    'class' => 'cdsp-review-toggle btn btn-icon',
+                    'data-target' => $groupid,
+                    'aria-expanded' => 'false',
+                    'title' => get_string('show'),
+                    'style' => 'padding:6px 8px;min-width:36px;',
+                ]
+            );
             $html .= \html_writer::tag('td', $togglebutton, ['class' => 'text-nowrap']);
             $html .= \html_writer::end_tag('tr');
 
@@ -896,12 +1012,16 @@ class preview_renderer {
             $groups[$signature]['hasadvisories'] = $groups[$signature]['hasadvisories'] || !empty($advisories);
             $groups[$signature]['hasrecommendedchange'] = $groups[$signature]['hasrecommendedchange'] ||
                 self::has_reviewable_recommendation($item, $recommendeditem, $advisories);
-            $groups[$signature]['hasautoproposedonly'] = $groups[$signature]['hasautoproposedonly'] || !empty($item['autoproposedonly']);
+            $groups[$signature]['hasautoproposedonly'] = $groups[$signature]['hasautoproposedonly'] ||
+                !empty($item['autoproposedonly']);
             $groups[$signature]['statusrank'] = min($groups[$signature]['statusrank'], self::get_status_rank($status));
             $groups[$signature]['status'] = self::get_status_from_rank($groups[$signature]['statusrank']);
             $groups[$signature]['currentts'] = self::min_non_zero($groups[$signature]['currentts'], (int)($item['current'] ?? 0));
             $groups[$signature]['newts'] = self::min_non_zero($groups[$signature]['newts'], (int)($effectiveitem['new'] ?? 0));
-            $groups[$signature]['recommendedts'] = self::min_non_zero($groups[$signature]['recommendedts'], (int)($recommendeditem['new'] ?? 0));
+            $groups[$signature]['recommendedts'] = self::min_non_zero(
+                $groups[$signature]['recommendedts'],
+                (int)($recommendeditem['new'] ?? 0)
+            );
 
             foreach ($advisories as $advisory) {
                 $text = (string)($advisory['text'] ?? '');
@@ -928,11 +1048,14 @@ class preview_renderer {
                 $groups[$key]['recommendedts'] = 0;
             }
             if (empty($groups[$key]['weeknumber'])) {
-                $groups[$key]['weeknumber'] = self::get_week_number((int)$groups[$key]['newts'], (int)($preview['newstartdate'] ?? 0));
+                $groups[$key]['weeknumber'] = self::get_week_number(
+                    (int)$groups[$key]['newts'],
+                    (int)($preview['newstartdate'] ?? 0)
+                );
             }
         }
 
-        uasort($groups, static function(array $left, array $right): int {
+        uasort($groups, static function (array $left, array $right): int {
             if ((int)$left['weeknumber'] !== (int)$right['weeknumber']) {
                 return (int)$left['weeknumber'] <=> (int)$right['weeknumber'];
             }
@@ -965,14 +1088,16 @@ class preview_renderer {
         ]);
         $html .= \html_writer::start_tag('thead');
         $html .= \html_writer::start_tag('tr');
-        foreach ([
-            get_string('previewfield', 'local_coursedateshiftpro'),
-            get_string('previewstatuscolumn', 'local_coursedateshiftpro'),
-            get_string('previewadvisoriescolumn', 'local_coursedateshiftpro'),
-            get_string('previewcurrentcolumn', 'local_coursedateshiftpro'),
-            get_string('previewnewcolumn', 'local_coursedateshiftpro'),
-            get_string('previewrecommendedcolumn', 'local_coursedateshiftpro'),
-        ] as $index => $heading) {
+        foreach (
+            [
+                get_string('previewfield', 'local_coursedateshiftpro'),
+                get_string('previewstatuscolumn', 'local_coursedateshiftpro'),
+                get_string('previewadvisoriescolumn', 'local_coursedateshiftpro'),
+                get_string('previewcurrentcolumn', 'local_coursedateshiftpro'),
+                get_string('previewnewcolumn', 'local_coursedateshiftpro'),
+                get_string('previewrecommendedcolumn', 'local_coursedateshiftpro'),
+            ] as $index => $heading
+        ) {
             $classes = [];
             if (in_array($index, [3, 4], true)) {
                 $classes[] = 'cdsp-advanced-only-cell';
@@ -1009,12 +1134,24 @@ class preview_renderer {
             $html .= \html_writer::tag('td', $fieldcontent);
             $html .= \html_writer::tag('td', self::render_status_badge($status));
             $html .= \html_writer::tag('td', self::render_advisories_cell($advisories));
-            $html .= \html_writer::tag('td', self::format_compact_preview_date((int)($item['current'] ?? 0)), ['class' => 'cdsp-date-compact cdsp-advanced-only-cell']);
-            $html .= \html_writer::tag('td', self::format_compact_preview_date((int)($effectiveitem['new'] ?? 0)), ['class' => 'cdsp-date-compact cdsp-advanced-only-cell']);
+            $html .= \html_writer::tag(
+                'td',
+                self::format_compact_preview_date((int)($item['current'] ?? 0)),
+                ['class' => 'cdsp-date-compact cdsp-advanced-only-cell']
+            );
+            $html .= \html_writer::tag(
+                'td',
+                self::format_compact_preview_date((int)($effectiveitem['new'] ?? 0)),
+                ['class' => 'cdsp-date-compact cdsp-advanced-only-cell']
+            );
             if (!$postapplystate) {
                 $html .= \html_writer::tag('td', self::render_manual_date_input($item, $recommendedts));
             } else {
-                $html .= \html_writer::tag('td', self::format_compact_preview_date($recommendedts), ['class' => 'cdsp-date-compact']);
+                $html .= \html_writer::tag(
+                    'td',
+                    self::format_compact_preview_date($recommendedts),
+                    ['class' => 'cdsp-date-compact']
+                );
             }
             $html .= \html_writer::end_tag('tr');
         }
@@ -1080,26 +1217,50 @@ class preview_renderer {
      */
     protected static function render_week_item_marker(string $marker): string {
         if ($marker === 'start') {
-            return \html_writer::tag('span',
+            return \html_writer::tag(
+                'span',
                 \html_writer::tag('span', '', ['class' => 'icon fa fa-play fa-fw', 'aria-hidden' => 'true']) .
-                \html_writer::tag('span', s(get_string('weeklyloadmarker_start', 'local_coursedateshiftpro')), ['class' => 'accesshide']),
-                ['class' => 'cdsp-week-item-marker cdsp-week-item-marker--start', 'title' => get_string('weeklyloadmarker_start', 'local_coursedateshiftpro')]
+                \html_writer::tag(
+                    'span',
+                    s(get_string('weeklyloadmarker_start', 'local_coursedateshiftpro')),
+                    ['class' => 'accesshide']
+                ),
+                [
+                    'class' => 'cdsp-week-item-marker cdsp-week-item-marker--start',
+                    'title' => get_string('weeklyloadmarker_start', 'local_coursedateshiftpro'),
+                ]
             ) . ' ';
         }
 
         if ($marker === 'end') {
-            return \html_writer::tag('span',
+            return \html_writer::tag(
+                'span',
                 \html_writer::tag('span', '', ['class' => 'icon fa fa-flag-checkered fa-fw', 'aria-hidden' => 'true']) .
-                \html_writer::tag('span', s(get_string('weeklyloadmarker_end', 'local_coursedateshiftpro')), ['class' => 'accesshide']),
-                ['class' => 'cdsp-week-item-marker cdsp-week-item-marker--end', 'title' => get_string('weeklyloadmarker_end', 'local_coursedateshiftpro')]
+                \html_writer::tag(
+                    'span',
+                    s(get_string('weeklyloadmarker_end', 'local_coursedateshiftpro')),
+                    ['class' => 'accesshide']
+                ),
+                [
+                    'class' => 'cdsp-week-item-marker cdsp-week-item-marker--end',
+                    'title' => get_string('weeklyloadmarker_end', 'local_coursedateshiftpro'),
+                ]
             ) . ' ';
         }
 
         if ($marker === 'single') {
-            return \html_writer::tag('span',
+            return \html_writer::tag(
+                'span',
                 \html_writer::tag('span', '', ['class' => 'icon fa fa-circle fa-fw', 'aria-hidden' => 'true']) .
-                \html_writer::tag('span', s(get_string('weeklyloadmarker_single', 'local_coursedateshiftpro')), ['class' => 'accesshide']),
-                ['class' => 'cdsp-week-item-marker cdsp-week-item-marker--single', 'title' => get_string('weeklyloadmarker_single', 'local_coursedateshiftpro')]
+                \html_writer::tag(
+                    'span',
+                    s(get_string('weeklyloadmarker_single', 'local_coursedateshiftpro')),
+                    ['class' => 'accesshide']
+                ),
+                [
+                    'class' => 'cdsp-week-item-marker cdsp-week-item-marker--single',
+                    'title' => get_string('weeklyloadmarker_single', 'local_coursedateshiftpro'),
+                ]
             ) . ' ';
         }
 
@@ -1189,14 +1350,30 @@ class preview_renderer {
      */
     protected static function render_review_controls(array $fieldoptions, array $statusoptions): string {
         $html = \html_writer::start_div('cdsp-review-controls cdsp-advanced-only');
-        $html .= self::render_select_control('cdsp-filter-field', get_string('reviewfilterfield', 'local_coursedateshiftpro'), get_string('reviewfilterall', 'local_coursedateshiftpro'), $fieldoptions);
-        $html .= self::render_select_control('cdsp-filter-status', get_string('reviewfilterstatus', 'local_coursedateshiftpro'), get_string('reviewfilterall', 'local_coursedateshiftpro'), $statusoptions);
-        $html .= self::render_select_control('cdsp-sort-by', get_string('reviewsortby', 'local_coursedateshiftpro'), '', [
-            'courseorder' => get_string('reviewsortcourseorder', 'local_coursedateshiftpro'),
-            'currentts' => get_string('reviewsortcurrentdate', 'local_coursedateshiftpro'),
-            'newts' => get_string('reviewsortnewdate', 'local_coursedateshiftpro'),
-            'recommendedts' => get_string('reviewsortrecommendeddate', 'local_coursedateshiftpro'),
-        ], 'recommendedts');
+        $html .= self::render_select_control(
+            'cdsp-filter-field',
+            get_string('reviewfilterfield', 'local_coursedateshiftpro'),
+            get_string('reviewfilterall', 'local_coursedateshiftpro'),
+            $fieldoptions
+        );
+        $html .= self::render_select_control(
+            'cdsp-filter-status',
+            get_string('reviewfilterstatus', 'local_coursedateshiftpro'),
+            get_string('reviewfilterall', 'local_coursedateshiftpro'),
+            $statusoptions
+        );
+        $html .= self::render_select_control(
+            'cdsp-sort-by',
+            get_string('reviewsortby', 'local_coursedateshiftpro'),
+            '',
+            [
+                'courseorder' => get_string('reviewsortcourseorder', 'local_coursedateshiftpro'),
+                'currentts' => get_string('reviewsortcurrentdate', 'local_coursedateshiftpro'),
+                'newts' => get_string('reviewsortnewdate', 'local_coursedateshiftpro'),
+                'recommendedts' => get_string('reviewsortrecommendeddate', 'local_coursedateshiftpro'),
+            ],
+            'recommendedts'
+        );
         $html .= \html_writer::tag('button', s(get_string('reviewresetfilters', 'local_coursedateshiftpro')), [
             'type' => 'button',
             'id' => 'cdsp-review-reset',
@@ -1217,7 +1394,13 @@ class preview_renderer {
      * @param string $selected
      * @return string
      */
-    protected static function render_select_control(string $id, string $label, string $placeholder, array $options, string $selected = ''): string {
+    protected static function render_select_control(
+        string $id,
+        string $label,
+        string $placeholder,
+        array $options,
+        string $selected = ''
+    ): string {
         $html = \html_writer::start_tag('label', ['class' => 'cdsp-review-control']);
         $html .= \html_writer::tag('span', s($label), ['class' => 'cdsp-review-control__label']);
         $html .= \html_writer::start_tag('select', [
@@ -1248,15 +1431,22 @@ class preview_renderer {
      */
     protected static function render_advisories_cell(array $advisories): string {
         if (empty($advisories)) {
-            return \html_writer::tag('span', s(get_string('reviewnoadvisories', 'local_coursedateshiftpro')), [
-                'style' => 'display:inline-block;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#ecfdf3;color:#166534;border:1px solid #86efac;',
-            ]);
+            return \html_writer::tag(
+                'span',
+                s(get_string('reviewnoadvisories', 'local_coursedateshiftpro')),
+                [
+                    'style' => 'display:inline-block;padding:7px 10px;border-radius:999px;' .
+                        'font-size:12px;font-weight:700;background:#ecfdf3;color:#166534;' .
+                        'border:1px solid #86efac;',
+                ]
+            );
         }
 
         $html = '';
         foreach ($advisories as $advisory) {
             $level = $advisory['level'] ?? 'info';
-            $styles = 'display:inline-block;margin:0 6px 6px 0;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent;';
+            $styles = 'display:inline-block;margin:0 6px 6px 0;padding:7px 10px;' .
+                'border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent;';
             if ($level === 'error') {
                 $styles .= 'background:#fff1f2;color:#b42318;border-color:#fda4af;box-shadow:0 0 0 1px rgba(180,35,24,.05);';
             } else if ($level === 'warning') {
@@ -1279,7 +1469,8 @@ class preview_renderer {
      * @return string
      */
     protected static function render_status_badge(string $statusplain): string {
-        $styles = 'display:inline-block;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent;';
+        $styles = 'display:inline-block;padding:7px 10px;border-radius:999px;' .
+            'font-size:12px;font-weight:700;border:1px solid transparent;';
         if ($statusplain === trim(get_string('previewstatusconflict', 'local_coursedateshiftpro'))) {
             $styles .= 'background:#fff1f2;color:#b42318;border-color:#fda4af;';
         } else if ($statusplain === trim(get_string('previewstatussuggested', 'local_coursedateshiftpro'))) {

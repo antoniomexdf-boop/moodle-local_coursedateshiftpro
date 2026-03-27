@@ -32,6 +32,8 @@ use local_coursedateshiftpro\local\preview_renderer;
 require_login();
 require_capability('local/coursedateshiftpro:manage', context_system::instance());
 
+// phpcs:disable moodle.Files.LineLength
+
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $newstartdateraw = optional_param_array('newstartdate', [], PARAM_INT);
 $newstartts = optional_param('newstartts', 0, PARAM_INT);
@@ -86,8 +88,13 @@ if ($continueafter) {
 $postapplystate = false;
 if (!empty($SESSION->local_coursedateshiftpro_lastapply)) {
     $lastrun = $SESSION->local_coursedateshiftpro_lastapply;
-    if (!empty($lastrun['courseid']) && (int)$lastrun['courseid'] === $courseid &&
-        empty($loadcoursepressed) && empty($historyviewid) && empty($previewrequested)) {
+    if (
+        !empty($lastrun['courseid']) &&
+        (int)$lastrun['courseid'] === $courseid &&
+        empty($loadcoursepressed) &&
+        empty($historyviewid) &&
+        empty($previewrequested)
+    ) {
         $postapplystate = true;
     }
 }
@@ -104,8 +111,10 @@ if ($undochanges && !empty($SESSION->local_coursedateshiftpro_lastapply)) {
 if ($historyrollbackid > 0) {
     require_sesskey();
     $historysummary = date_shifter::rollback_execution($historyrollbackid);
-    if (!empty($SESSION->local_coursedateshiftpro_lastapply['executionid']) &&
-        (int)$SESSION->local_coursedateshiftpro_lastapply['executionid'] === $historyrollbackid) {
+    if (
+        !empty($SESSION->local_coursedateshiftpro_lastapply['executionid']) &&
+        (int)$SESSION->local_coursedateshiftpro_lastapply['executionid'] === $historyrollbackid
+    ) {
         unset($SESSION->local_coursedateshiftpro_lastapply);
     }
     \core\notification::success(get_string('changesundonehistory', 'local_coursedateshiftpro'));
@@ -170,7 +179,13 @@ if (($data = $mform->get_data()) && !empty($data->previewdates)) {
         'courseloaded' => !empty($selectedcourse),
     ]);
 } else if ($selectedcourse && !empty($newstartdate) && ($applychanges || $previewrequested || $historyviewid > 0)) {
-    $preview = date_shifter::build_preview((int)$selectedcourse->id, $newstartdate, $filters, !empty($useautoschedule), $manualdates);
+    $preview = date_shifter::build_preview(
+        (int)$selectedcourse->id,
+        $newstartdate,
+        $filters,
+        !empty($useautoschedule),
+        $manualdates
+    );
     if (empty($selecteditemkeys)) {
         $selecteditemkeys = array_keys($preview['items']);
     }
@@ -178,7 +193,13 @@ if (($data = $mform->get_data()) && !empty($data->previewdates)) {
 
 if ($applychanges && $selectedcourse) {
     require_sesskey();
-    $preview = date_shifter::build_preview((int)$selectedcourse->id, $newstartdate, $filters, !empty($useautoschedule), $manualdates);
+    $preview = date_shifter::build_preview(
+        (int)$selectedcourse->id,
+        $newstartdate,
+        $filters,
+        !empty($useautoschedule),
+        $manualdates
+    );
     $hasadvisories = !empty($preview['validations']['warnings']) || !empty($preview['validations']['info']);
 
     if (!empty($preview['validations']['errors'])) {
@@ -382,7 +403,11 @@ function local_coursedateshiftpro_render_history(array $history, int $courseid):
                 'class' => 'coursedateshiftpro-history__actionform',
             ]);
             $actions .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
-            $actions .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'historyrollbackid', 'value' => (int)$entry->id]);
+            $actions .= \html_writer::empty_tag('input', [
+                'type' => 'hidden',
+                'name' => 'historyrollbackid',
+                'value' => (int)$entry->id,
+            ]);
             if ($courseid > 0) {
                 $actions .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'courseid', 'value' => $courseid]);
             }
@@ -471,7 +496,9 @@ function local_coursedateshiftpro_get_history_stats(array $history): array {
  */
 function local_coursedateshiftpro_render_history_detail(\stdClass $entry): string {
     $summary = $entry->summary ?? [];
-    $blocks = !empty($summary['blocks']) && is_array($summary['blocks']) ? implode(', ', $summary['blocks']) : get_string('notset', 'local_coursedateshiftpro');
+    $blocks = !empty($summary['blocks']) && is_array($summary['blocks']) ?
+        implode(', ', $summary['blocks']) :
+        get_string('notset', 'local_coursedateshiftpro');
     $weektext = get_string('notset', 'local_coursedateshiftpro');
     $weeks = [];
     if (!empty($summary['weeklyload']['weeks']) && is_array($summary['weeklyload']['weeks'])) {
@@ -495,7 +522,8 @@ function local_coursedateshiftpro_render_history_detail(\stdClass $entry): strin
     }
 
     $rows = [
-        get_string('historydetaildates', 'local_coursedateshiftpro') => userdate((int)$entry->oldstartdate) . ' -> ' . userdate((int)$entry->newstartdate),
+        get_string('historydetaildates', 'local_coursedateshiftpro') =>
+            userdate((int)$entry->oldstartdate) . ' -> ' . userdate((int)$entry->newstartdate),
         get_string('historydetailshift', 'local_coursedateshiftpro') => format_time(abs((int)$entry->delta)),
         get_string('historydetailblocks', 'local_coursedateshiftpro') => $blocks,
         get_string('historydetailrecords', 'local_coursedateshiftpro') => (int)($summary['records'] ?? 0),
@@ -540,7 +568,11 @@ function local_coursedateshiftpro_render_loaded_history_notice(\stdClass $histor
     $html = \html_writer::start_div('', [
         'class' => 'coursedateshiftpro-history__loaded',
     ]);
-    $html .= \html_writer::tag('h3', s(get_string('historyloadedtitle', 'local_coursedateshiftpro')), ['class' => 'coursedateshiftpro-history__loaded-title']);
+    $html .= \html_writer::tag(
+        'h3',
+        s(get_string('historyloadedtitle', 'local_coursedateshiftpro')),
+        ['class' => 'coursedateshiftpro-history__loaded-title']
+    );
     foreach ($details as $label => $value) {
         $html .= \html_writer::tag('div', s($label) . ': ' . $value, ['class' => 'coursedateshiftpro-history__loaded-row']);
     }

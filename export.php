@@ -28,6 +28,8 @@ require_once($CFG->libdir . '/pdflib.php');
 
 use local_coursedateshiftpro\local\date_shifter;
 
+// phpcs:disable moodle.Files.LineLength
+
 /**
  * Returns a local path to the configured compact logo when available.
  *
@@ -82,7 +84,7 @@ function local_coursedateshiftpro_get_pdf_logo_path(): string {
         return '';
     }
 
-    usort($candidates, static function(string $left, string $right): int {
+    usort($candidates, static function (string $left, string $right): int {
         return filemtime($right) <=> filemtime($left);
     });
 
@@ -145,7 +147,9 @@ $executionid = required_param('executionid', PARAM_INT);
 $execution = date_shifter::get_history_execution($executionid);
 $summary = $execution->summary ?? [];
 $lines = $summary['report']['lines'] ?? [];
-$blocks = !empty($summary['blocks']) && is_array($summary['blocks']) ? implode(', ', $summary['blocks']) : get_string('notset', 'local_coursedateshiftpro');
+$blocks = !empty($summary['blocks']) && is_array($summary['blocks']) ?
+    implode(', ', $summary['blocks']) :
+    get_string('notset', 'local_coursedateshiftpro');
 $site = get_site();
 $sitename = format_string($site->fullname ?? '');
 $logosource = local_coursedateshiftpro_get_pdf_logo_path();
@@ -163,40 +167,54 @@ $left = 15;
 $right = 195;
 $topliney = 15;
 $bottomliney = 42;
-$logoX = 20;
-$logoY = 19;
-$logoW = 20;
-$logoH = 20;
-$textX = 48;
-$textY = 20;
+$logox = 20;
+$logoy = 19;
+$logow = 20;
+$logoh = 20;
+$textx = 48;
+$texty = 20;
 
 $pdf->SetLineWidth(0.6);
 $pdf->Line($left, $topliney, $right, $topliney);
 $pdf->Line($left, $bottomliney, $right, $bottomliney);
 
 if ($logosource !== '' && is_readable($logosource)) {
-    $pdf->Image($logosource, $logoX, $logoY, $logoW, $logoH, '', '', '', false, 300);
+    $pdf->Image($logosource, $logox, $logoy, $logow, $logoh, '', '', '', false, 300);
 }
 
-$pdf->SetXY($textX, $textY);
+$pdf->SetXY($textx, $texty);
 $pdf->SetFont('times', 'B', 24);
 $pdf->Cell(0, 8, $sitename, 0, 1, 'C');
-$pdf->SetX($textX);
+$pdf->SetX($textx);
 $pdf->SetFont('times', '', 17);
 $pdf->Cell(0, 8, get_string('historyreporttitle', 'local_coursedateshiftpro'), 0, 1, 'C');
 $pdf->SetY(48);
 
 $html = '';
 $html .= '<table cellpadding="3" cellspacing="0" border="1" style="font-size:8px;">';
-$html .= '<tr><td><strong>' . s(get_string('historyreportid', 'local_coursedateshiftpro')) . '</strong></td><td>CDSP-' . (int)$execution->id . '</td></tr>';
-$html .= '<tr><td><strong>' . s(get_string('historyreportgenerated', 'local_coursedateshiftpro')) . '</strong></td><td>' . s(userdate(time())) . '</td></tr>';
-$html .= '<tr><td><strong>' . s(get_string('historyreportcourse', 'local_coursedateshiftpro')) . '</strong></td><td>' . s(format_string($execution->coursename)) . '</td></tr>';
-$html .= '<tr><td><strong>' . s(get_string('historyreportuser', 'local_coursedateshiftpro')) . '</strong></td><td>' . s((string)$execution->actorname) . '</td></tr>';
-$html .= '<tr><td><strong>' . s(get_string('historyreportstatus', 'local_coursedateshiftpro')) . '</strong></td><td>' . s((string)$execution->statuslabel) . '</td></tr>';
+$html .= '<tr><td><strong>' .
+    s(get_string('historyreportid', 'local_coursedateshiftpro')) .
+    '</strong></td><td>CDSP-' . (int)$execution->id . '</td></tr>';
+$html .= '<tr><td><strong>' .
+    s(get_string('historyreportgenerated', 'local_coursedateshiftpro')) .
+    '</strong></td><td>' . s(userdate(time())) . '</td></tr>';
+$html .= '<tr><td><strong>' .
+    s(get_string('historyreportcourse', 'local_coursedateshiftpro')) .
+    '</strong></td><td>' . s(format_string($execution->coursename)) . '</td></tr>';
+$html .= '<tr><td><strong>' .
+    s(get_string('historyreportuser', 'local_coursedateshiftpro')) .
+    '</strong></td><td>' . s((string)$execution->actorname) . '</td></tr>';
+$html .= '<tr><td><strong>' .
+    s(get_string('historyreportstatus', 'local_coursedateshiftpro')) .
+    '</strong></td><td>' . s((string)$execution->statuslabel) . '</td></tr>';
 $html .= '<tr><td><strong>' . s(get_string('historyreportdates', 'local_coursedateshiftpro')) . '</strong></td><td>' .
     s(userdate((int)$execution->oldstartdate)) . ' -> ' . s(userdate((int)$execution->newstartdate)) . '</td></tr>';
-$html .= '<tr><td><strong>' . s(get_string('historyreportshift', 'local_coursedateshiftpro')) . '</strong></td><td>' . s(format_time(abs((int)$execution->delta))) . '</td></tr>';
-$html .= '<tr><td><strong>' . s(get_string('historyreportblocks', 'local_coursedateshiftpro')) . '</strong></td><td>' . s($blocks) . '</td></tr>';
+$html .= '<tr><td><strong>' .
+    s(get_string('historyreportshift', 'local_coursedateshiftpro')) .
+    '</strong></td><td>' . s(format_time(abs((int)$execution->delta))) . '</td></tr>';
+$html .= '<tr><td><strong>' .
+    s(get_string('historyreportblocks', 'local_coursedateshiftpro')) .
+    '</strong></td><td>' . s($blocks) . '</td></tr>';
 $html .= '</table>';
 $html .= '<br>';
 
@@ -213,7 +231,9 @@ if (empty($lines)) {
     $html .= '<th>' . s(get_string('historyreportnewcolumn', 'local_coursedateshiftpro')) . '</th>';
     $html .= '</tr></thead><tbody>';
     foreach ($lines as $index => $line) {
-        $weeklabel = !empty($line['weeknumber']) ? get_string('weeklyloadweeklabel', 'local_coursedateshiftpro', (int)$line['weeknumber']) : get_string('notset', 'local_coursedateshiftpro');
+        $weeklabel = !empty($line['weeknumber']) ?
+            get_string('weeklyloadweeklabel', 'local_coursedateshiftpro', (int)$line['weeknumber']) :
+            get_string('notset', 'local_coursedateshiftpro');
         $oldvalue = !empty($line['oldvalue']) ? userdate((int)$line['oldvalue']) : get_string('notset', 'local_coursedateshiftpro');
         $newvalue = !empty($line['newvalue']) ? userdate((int)$line['newvalue']) : get_string('notset', 'local_coursedateshiftpro');
         $markerhtml = '';
@@ -233,9 +253,12 @@ if (empty($lines)) {
     }
     $html .= '</tbody></table>';
     $html .= '<br><div style="font-size:8px;color:#475569;">';
-    $html .= '<span style="color:#0f6cbf;font-weight:bold;">START</span> ' . s(get_string('weeklyloadmarker_start', 'local_coursedateshiftpro')) . ' &nbsp; ';
-    $html .= '<span style="color:#b45309;font-weight:bold;">END</span> ' . s(get_string('weeklyloadmarker_end', 'local_coursedateshiftpro')) . ' &nbsp; ';
-    $html .= '<span style="color:#047857;font-weight:bold;">ONE</span> ' . s(get_string('weeklyloadmarker_single', 'local_coursedateshiftpro'));
+    $html .= '<span style="color:#0f6cbf;font-weight:bold;">START</span> ' .
+        s(get_string('weeklyloadmarker_start', 'local_coursedateshiftpro')) . ' &nbsp; ';
+    $html .= '<span style="color:#b45309;font-weight:bold;">END</span> ' .
+        s(get_string('weeklyloadmarker_end', 'local_coursedateshiftpro')) . ' &nbsp; ';
+    $html .= '<span style="color:#047857;font-weight:bold;">ONE</span> ' .
+        s(get_string('weeklyloadmarker_single', 'local_coursedateshiftpro'));
     $html .= '</div>';
 }
 

@@ -179,7 +179,10 @@ define(['local_coursedateshiftpro/repository', 'core/notification'], function(Re
             });
         });
 
-        applyMode((stateHolder && stateHolder.dataset.cdspMode) || (preview.classList.contains('cdsp-mode-advanced') ? 'advanced' : 'simple'));
+        applyMode(
+            (stateHolder && stateHolder.dataset.cdspMode) ||
+            (preview.classList.contains('cdsp-mode-advanced') ? 'advanced' : 'simple')
+        );
     };
 
     const initPreviewUi = (container = document) => {
@@ -251,7 +254,11 @@ define(['local_coursedateshiftpro/repository', 'core/notification'], function(Re
                     return leftValue - rightValue;
                 }
 
-                return (left.mainRow.querySelector('td')?.textContent || '').localeCompare(right.mainRow.querySelector('td')?.textContent || '');
+                return (
+                    left.mainRow.querySelector('td')?.textContent || ''
+                ).localeCompare(
+                    right.mainRow.querySelector('td')?.textContent || ''
+                );
             }).forEach(({mainRow, detailRow}) => {
                 tbody.appendChild(mainRow);
                 if (detailRow) {

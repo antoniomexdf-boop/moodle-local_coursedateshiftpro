@@ -27,8 +27,6 @@ namespace local_coursedateshiftpro\local;
 use xmldb_field;
 use xmldb_table;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Pro demo service for selective course date shifting.
  */
@@ -120,7 +118,13 @@ class date_shifter {
         global $DB;
 
         $options = [];
-        $records = $DB->get_records_select('course', 'id <> :siteid', ['siteid' => SITEID], 'fullname ASC', 'id, fullname, shortname');
+        $records = $DB->get_records_select(
+            'course',
+            'id <> :siteid',
+            ['siteid' => SITEID],
+            'fullname ASC',
+            'id, fullname, shortname'
+        );
         foreach ($records as $record) {
             $options[$record->id] = format_string($record->fullname) . ' (' . s($record->shortname) . ')';
         }
@@ -167,7 +171,7 @@ class date_shifter {
             }
         }
 
-        return array_map(static function($value): int {
+        return array_map(static function ($value): int {
             return empty($value) ? 0 : 1;
         }, $rawfilters);
     }
@@ -178,6 +182,8 @@ class date_shifter {
      * @param int $courseid
      * @param int $newstartdate
      * @param array $filters
+     * @param bool $useautoschedule
+     * @param array $manualdates
      * @return array
      */
     public static function build_preview(
@@ -235,7 +241,9 @@ class date_shifter {
                     continue;
                 }
 
-                $label = trim((string)$section->name) !== '' ? format_string($section->name) : get_string('sectionx', 'moodle', $section->section);
+                $label = trim((string)$section->name) !== '' ?
+                    format_string($section->name) :
+                    get_string('sectionx', 'moodle', $section->section);
                 self::collect_availability_items(
                     $decoded,
                     $delta,
@@ -253,7 +261,12 @@ class date_shifter {
         $modulemap = self::get_module_table_map();
         $coursemoduleordermap = self::get_course_module_order_map($courseid);
         $modinfo = get_fast_modinfo($course);
-        $cms = $DB->get_records('course_modules', ['course' => $courseid], '', 'id, module, instance, availability, completionexpected');
+        $cms = $DB->get_records(
+            'course_modules',
+            ['course' => $courseid],
+            '',
+            'id, module, instance, availability, completionexpected'
+        );
 
         foreach ($cms as $cm) {
             $modname = $modulemap[$cm->module] ?? '';
@@ -409,7 +422,11 @@ class date_shifter {
             'delta' => $delta,
             'items' => $items,
             'effectiveitems' => $effectiveitems,
-            'weeklyload' => self::build_weekly_load_overview($effectiveitems, $newstartdate, self::get_effective_course_end_date($course, $effectiveitems, $newstartdate)),
+            'weeklyload' => self::build_weekly_load_overview(
+                $effectiveitems,
+                $newstartdate,
+                self::get_effective_course_end_date($course, $effectiveitems, $newstartdate)
+            ),
             'groupeditems' => $groupeditems,
             'skipped' => array_values(array_unique($skipped)),
             'autoschedule' => [
@@ -524,7 +541,7 @@ class date_shifter {
 
         foreach ($weeks as $index => $week) {
             $weeks[$index]['activitycount'] = count($week['items']);
-            uasort($weeks[$index]['items'], static function(array $left, array $right): int {
+            uasort($weeks[$index]['items'], static function (array $left, array $right): int {
                 if ((int)$left['sortts'] !== (int)$right['sortts']) {
                     return (int)$left['sortts'] <=> (int)$right['sortts'];
                 }
@@ -610,6 +627,8 @@ class date_shifter {
      * @param int $newstartdate
      * @param array $filters
      * @param array $selectedkeys
+     * @param bool $useautoschedule
+     * @param array $manualdates
      * @return array
      */
     public static function apply_selected_changes(
@@ -732,7 +751,11 @@ class date_shifter {
                         if (is_array($decoded)) {
                             $rollbackentry['availability'] = $existingrecord->availability;
                             foreach ($payload['availability'] as $availabilitychange) {
-                                if (self::set_availability_timestamp_by_path($decoded, $availabilitychange['path'], (int)$availabilitychange['new'])) {
+                                if (self::set_availability_timestamp_by_path(
+                                    $decoded,
+                                    $availabilitychange['path'],
+                                    (int)$availabilitychange['new']
+                                )) {
                                     $summary['availability']++;
                                     $recordtouched = true;
                                 }
@@ -757,7 +780,8 @@ class date_shifter {
         rebuild_course_cache($courseid, true);
         $transaction->allow_commit();
 
-        $summary['autoscheduleapplied'] = !empty($preview['autoschedule']['enabled']) && !empty($preview['autoschedule']['available']) ? 1 : 0;
+        $summary['autoscheduleapplied'] = !empty($preview['autoschedule']['enabled']) &&
+            !empty($preview['autoschedule']['available']) ? 1 : 0;
         $summary['autoscheduleadjustments'] = (int)($preview['autoschedule']['adjustmentcount'] ?? 0);
 
         return $summary;
@@ -1030,9 +1054,12 @@ class date_shifter {
      * Collects override items if the table exists.
      *
      * @param string $modtable
+     * @param string $modname
      * @param int $instanceid
      * @param string $cmname
      * @param int $delta
+     * @param int $courseorder
+     * @param string $itemurl
      * @param array $items
      * @return void
      */
@@ -1073,7 +1100,8 @@ class date_shifter {
                     'field' => $field,
                     'courseorder' => $courseorder,
                     'itemurl' => $itemurl,
-                    'label' => $cmname . ' - ' . get_string('overrideitemlabel', 'local_coursedateshiftpro', $record->id),
+                    'label' => $cmname . ' - ' .
+                        get_string('overrideitemlabel', 'local_coursedateshiftpro', $record->id),
                     'fieldlabel' => self::humanise_field_for_module($field, $modname),
                     'current' => (int)$record->{$field},
                     'new' => self::shift_timestamp((int)$record->{$field}, $delta),
@@ -1091,6 +1119,8 @@ class date_shifter {
      * @param string $table
      * @param int $recordid
      * @param string $label
+     * @param int $courseorder
+     * @param string $itemurl
      * @param array $items
      * @param array $path
      * @return void
@@ -1129,7 +1159,18 @@ class date_shifter {
             }
 
             if (self::is_assoc($value)) {
-                self::collect_availability_items($value, $delta, $category, $table, $recordid, $label, $courseorder, $itemurl, $items, array_merge($path, [$key]));
+                self::collect_availability_items(
+                    $value,
+                    $delta,
+                    $category,
+                    $table,
+                    $recordid,
+                    $label,
+                    $courseorder,
+                    $itemurl,
+                    $items,
+                    array_merge($path, [$key])
+                );
                 continue;
             }
 
@@ -1428,7 +1469,7 @@ class date_shifter {
             ];
         }
 
-        usort($lines, static function(array $left, array $right): int {
+        usort($lines, static function (array $left, array $right): int {
             if ((int)$left['weeknumber'] !== (int)$right['weeknumber']) {
                 return (int)$left['weeknumber'] <=> (int)$right['weeknumber'];
             }
@@ -1671,6 +1712,8 @@ class date_shifter {
      * @param string $table
      * @param int $recordid
      * @param string $cmname
+     * @param int $courseorder
+     * @param string $itemurl
      * @param array $detectedfields
      * @param int $newstartdate
      * @param int $delta
@@ -1760,6 +1803,7 @@ class date_shifter {
      * @param array $items
      * @param int $newstartdate
      * @param int $futurecourseend
+     * @param bool $preservemanualdates
      * @return array
      */
     private static function build_autoschedule_plan(array $items, int $newstartdate, int $futurecourseend = 0): array {
@@ -1768,7 +1812,7 @@ class date_shifter {
         $daycounts = [];
         $weekcounts = [];
 
-        uasort($adjusteditems, static function(array $a, array $b): int {
+        uasort($adjusteditems, static function (array $a, array $b): int {
             return (int)$a['new'] <=> (int)$b['new'];
         });
 
@@ -1853,6 +1897,9 @@ class date_shifter {
      *
      * @param array $items
      * @param array $manualdates
+     * @param int $newstartdate
+     * @param int $futurecourseend
+     * @param bool $preservemanualdates
      * @return array
      */
     private static function apply_manual_date_overrides(
@@ -1927,7 +1974,12 @@ class date_shifter {
                         continue;
                     }
 
-                    [$minbound, $maxbound] = self::get_autoschedule_bounds($items[$targetkey], $items, $newstartdate, $futurecourseend);
+                    [$minbound, $maxbound] = self::get_autoschedule_bounds(
+                        $items[$targetkey],
+                        $items,
+                        $newstartdate,
+                        $futurecourseend
+                    );
                     $candidate = $anchorts + ($offsetdays * DAYSECS);
                     $bounded = self::normalise_candidate_within_bounds($candidate, $minbound, $maxbound, true);
                     if ($bounded <= 0) {
@@ -1954,7 +2006,12 @@ class date_shifter {
      * @param int $futurecourseend
      * @return array
      */
-    private static function get_autoschedule_bounds(array $item, array $adjusteditems, int $newstartdate, int $futurecourseend): array {
+    private static function get_autoschedule_bounds(
+        array $item,
+        array $adjusteditems,
+        int $newstartdate,
+        int $futurecourseend
+    ): array {
         $minbound = max(1, $newstartdate);
         $maxbound = $futurecourseend > 0 ? $futurecourseend : PHP_INT_MAX;
         $recordsignature = self::get_record_signature($item);
@@ -2106,6 +2163,7 @@ class date_shifter {
      * @param int $candidate
      * @param int $minbound
      * @param int $maxbound
+     * @param bool $preserveweekends
      * @return int
      */
     private static function normalise_candidate_within_bounds(
@@ -2209,7 +2267,12 @@ class date_shifter {
      * @param array $effectiveitems
      * @return array
      */
-    private static function build_item_advisories(\stdClass $course, int $newstartdate, array $items, array $effectiveitems): array {
+    private static function build_item_advisories(
+        \stdClass $course,
+        int $newstartdate,
+        array $items,
+        array $effectiveitems
+    ): array {
         $advisories = [];
         $futurecourseend = self::get_effective_course_end_date($course, $effectiveitems, $newstartdate);
         $effectivelookup = [];
