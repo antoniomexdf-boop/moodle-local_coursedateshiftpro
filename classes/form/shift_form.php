@@ -145,5 +145,4 @@ class shift_form extends \moodleform {
             'completionexpected' => get_string('filtercompletionexpected', 'local_coursedateshiftpro'),
         ];
     }
-
 }

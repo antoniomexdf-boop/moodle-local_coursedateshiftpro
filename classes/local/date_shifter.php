@@ -751,11 +751,13 @@ class date_shifter {
                         if (is_array($decoded)) {
                             $rollbackentry['availability'] = $existingrecord->availability;
                             foreach ($payload['availability'] as $availabilitychange) {
-                                if (self::set_availability_timestamp_by_path(
-                                    $decoded,
-                                    $availabilitychange['path'],
-                                    (int)$availabilitychange['new']
-                                )) {
+                                if (
+                                    self::set_availability_timestamp_by_path(
+                                        $decoded,
+                                        $availabilitychange['path'],
+                                        (int)$availabilitychange['new']
+                                    )
+                                ) {
                                     $summary['availability']++;
                                     $recordtouched = true;
                                 }
@@ -1899,7 +1901,6 @@ class date_shifter {
      * @param array $manualdates
      * @param int $newstartdate
      * @param int $futurecourseend
-     * @param bool $preservemanualdates
      * @return array
      */
     private static function apply_manual_date_overrides(
@@ -1929,6 +1930,7 @@ class date_shifter {
      * @param array $manualdates
      * @param int $newstartdate
      * @param int $futurecourseend
+     * @param bool $preservemanualdates
      * @return array
      */
     private static function apply_linked_date_suggestions(
@@ -2069,6 +2071,7 @@ class date_shifter {
      * @param array $items
      * @param int $newstartdate
      * @param int $futurecourseend
+     * @param bool $preservemanualdates
      * @return array
      */
     private static function enforce_autoschedule_consistency(
