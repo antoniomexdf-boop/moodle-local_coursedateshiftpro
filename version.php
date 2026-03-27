@@ -27,5 +27,5 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'local_coursedateshiftpro';
 $plugin->version = 2026032429;
 $plugin->requires = 2022112800; // Moodle 4.1+.
-$plugin->maturity = MATURITY_BETA;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->release = '1.9.2-pro-pdf-branding-freeze';

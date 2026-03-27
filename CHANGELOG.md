@@ -7,6 +7,7 @@
 - Moved weekly flow markers into a dedicated `Flow` column in the PDF detail table.
 - Reduced PDF detail typography and spacing for better readability in longer exports.
 - Documented the stable PDF branding and export behavior in the release-facing documentation.
+- Raised the declared plugin maturity to `MATURITY_STABLE` for release packaging and submission.
 
 ## 1.9.1-pro-pdf-export
 
