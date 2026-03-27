@@ -1805,7 +1805,6 @@ class date_shifter {
      * @param array $items
      * @param int $newstartdate
      * @param int $futurecourseend
-     * @param bool $preservemanualdates
      * @return array
      */
     private static function build_autoschedule_plan(array $items, int $newstartdate, int $futurecourseend = 0): array {
@@ -1930,7 +1929,6 @@ class date_shifter {
      * @param array $manualdates
      * @param int $newstartdate
      * @param int $futurecourseend
-     * @param bool $preservemanualdates
      * @return array
      */
     private static function apply_linked_date_suggestions(
