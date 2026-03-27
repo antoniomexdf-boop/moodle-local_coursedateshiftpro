@@ -1,0 +1,384 @@
+/**
+ * @module local_coursedateshiftpro/preview
+ * @copyright 2026 Jesus Antonio Jimenez Aviña <antoniomexdf@gmail.com> <antoniojamx@gmail.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+define(['local_coursedateshiftpro/repository', 'core/notification'], function(Repository, Notification) {
+    const PREVIEW_ACTIONS = new Set(['previewdates', 'refreshpreview']);
+    const FILTER_KEYS = [
+        'courseenddate',
+        'activities',
+        'sections',
+        'restrictions',
+        'overrides',
+        'completionexpected',
+    ];
+
+    const getPreviewRoot = () => document.getElementById('cdsp-preview-root');
+
+    const getSubmitterName = (event, form) => {
+        if (event.submitter && event.submitter.name) {
+            return event.submitter.name;
+        }
+
+        return form.dataset.cdspSubmitter || '';
+    };
+
+    const buildPayload = (form) => {
+        const data = new FormData(form);
+        const getInt = (name) => Number(data.get(name) || 0);
+        const payload = {
+            courseid: getInt('courseid'),
+            newstartts: getInt('newstartts'),
+            newstartyear: getInt('newstartdate[year]'),
+            newstartmonth: getInt('newstartdate[month]'),
+            newstartday: getInt('newstartdate[day]'),
+            newstarthour: getInt('newstartdate[hour]'),
+            newstartminute: getInt('newstartdate[minute]'),
+            filters: {},
+            useautoschedule: data.has('useautoschedule') ? 1 : 0,
+            selectedkeys: data.getAll('selectedkeys[]').filter(Boolean),
+            manualdates: [],
+        };
+
+        FILTER_KEYS.forEach((key) => {
+            payload.filters[key] = data.has('filters[' + key + ']') ? 1 : 0;
+        });
+
+        form.querySelectorAll('input[name^="manualdates["]').forEach((input) => {
+            const match = input.name.match(/^manualdates\[(.+)\]$/);
+            if (!match) {
+                return;
+            }
+
+            payload.manualdates.push({
+                key: match[1],
+                value: input.value || '',
+            });
+        });
+
+        return payload;
+    };
+
+    const setBusy = (submitter, root, busy) => {
+        if (submitter) {
+            submitter.disabled = busy;
+            if (busy) {
+                submitter.dataset.originalText = submitter.textContent;
+                submitter.textContent = '...';
+            } else if (submitter.dataset.originalText) {
+                submitter.textContent = submitter.dataset.originalText;
+            }
+        }
+
+        if (root) {
+            root.setAttribute('aria-busy', busy ? 'true' : 'false');
+            root.style.opacity = busy ? '0.6' : '1';
+        }
+    };
+
+    let refreshTimer = null;
+
+    const getToggleIconMarkup = (expanded) => (
+        '<span class="icon fa ' + (expanded ? 'fa-chevron-up' : 'fa-chevron-down') + ' fa-fw" aria-hidden="true"></span>' +
+        '<span class="accesshide">' + (expanded ? 'Hide' : 'Show') + '</span>'
+    );
+
+    const toLocalInputValue = (date) => {
+        const pad = (value) => String(value).padStart(2, '0');
+        return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) +
+            'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+    };
+
+    const shiftLocalInputValue = (value, offsetDays) => {
+        if (!value) {
+            return '';
+        }
+
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+
+        date.setDate(date.getDate() + offsetDays);
+        return toLocalInputValue(date);
+    };
+
+    const syncLinkedSuggestedDates = (input, previewForm) => {
+        const field = input.dataset.field || '';
+        const recordSignature = input.dataset.recordSignature || '';
+        if (!field || !recordSignature || !input.value) {
+            return;
+        }
+
+        const relatedRules = {
+            duedate: {
+                allowsubmissionsfromdate: -1,
+                cutoffdate: 1,
+                gradingduedate: 0,
+            },
+            timeclose: {
+                timeopen: -1,
+            },
+            availableuntil: {
+                availablefrom: -1,
+            },
+            submissionend: {
+                submissionstart: -1,
+            },
+        };
+
+        if (!relatedRules[field]) {
+            return;
+        }
+
+        Object.entries(relatedRules[field]).forEach(([targetField, offsetDays]) => {
+            const target = previewForm.querySelector(
+                'input[type="datetime-local"][data-record-signature="' + recordSignature + '"][data-field="' + targetField + '"]'
+            );
+            if (!target || target === input) {
+                return;
+            }
+
+            target.value = shiftLocalInputValue(input.value, offsetDays);
+        });
+    };
+
+    const initReviewModes = (container = document) => {
+        const preview = container.querySelector('.coursedateshiftpro-preview');
+        if (!preview) {
+            return;
+        }
+        const stateHolder = container === document ? getPreviewRoot() : container;
+
+        const buttons = Array.from(preview.querySelectorAll('.cdsp-mode-button'));
+        if (!buttons.length) {
+            return;
+        }
+
+        const applyMode = (mode) => {
+            const normalized = mode === 'advanced' ? 'advanced' : 'simple';
+            preview.classList.remove('cdsp-mode-simple', 'cdsp-mode-advanced');
+            preview.classList.add('cdsp-mode-' + normalized);
+            if (stateHolder) {
+                stateHolder.dataset.cdspMode = normalized;
+            }
+
+            buttons.forEach((button) => {
+                const active = button.dataset.mode === normalized;
+                button.classList.toggle('is-active', active);
+                button.classList.toggle('btn-primary', active);
+                button.classList.toggle('btn-secondary', !active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+        };
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                applyMode(button.dataset.mode || 'simple');
+            });
+        });
+
+        applyMode((stateHolder && stateHolder.dataset.cdspMode) || (preview.classList.contains('cdsp-mode-advanced') ? 'advanced' : 'simple'));
+    };
+
+    const initPreviewUi = (container = document) => {
+        initReviewModes(container);
+        initReviewTable(container);
+    };
+
+    const requestPreviewRefresh = async(form, root) => {
+        const payload = buildPayload(form);
+        if (!payload.courseid) {
+            return;
+        }
+
+        setBusy(null, root, true);
+        try {
+            const response = await Repository.getPreview(payload);
+            root.innerHTML = response.html || '';
+            initPreviewUi(root);
+        } catch (error) {
+            Notification.exception(error);
+        } finally {
+            setBusy(null, root, false);
+        }
+    };
+
+    const initReviewTable = (container = document) => {
+        const table = container.querySelector('#cdsp-review-table');
+        if (!table) {
+            return;
+        }
+
+        const fieldFilter = container.querySelector('#cdsp-filter-field');
+        const statusFilter = container.querySelector('#cdsp-filter-status');
+        const sortBy = container.querySelector('#cdsp-sort-by');
+        const resetButton = container.querySelector('#cdsp-review-reset');
+        const tbody = table.querySelector('tbody');
+        if (!tbody) {
+            return;
+        }
+
+        const getGroupRows = () => Array.from(tbody.querySelectorAll('.cdsp-review-group-main')).map((mainRow) => {
+            const groupId = mainRow.dataset.groupId || '';
+            const detailRow = tbody.querySelector('.cdsp-review-group-detail[data-parent-id="' + groupId + '"]');
+            return {mainRow, detailRow};
+        });
+
+        const applyControls = () => {
+            const groups = getGroupRows();
+            const fieldValue = fieldFilter ? fieldFilter.value : '';
+            const statusValue = statusFilter ? statusFilter.value : '';
+            const sortValue = sortBy ? sortBy.value : 'recommendedts';
+
+            groups.forEach(({mainRow, detailRow}) => {
+                const fieldTokens = (mainRow.dataset.fields || '').split('||').filter(Boolean);
+                const matchField = !fieldValue || fieldTokens.includes(fieldValue);
+                const matchStatus = !statusValue || mainRow.dataset.status === statusValue;
+                const visible = matchField && matchStatus;
+                mainRow.style.display = visible ? '' : 'none';
+                if (detailRow) {
+                    const expanded = mainRow.dataset.expanded === '1';
+                    detailRow.style.display = (visible && expanded) ? '' : 'none';
+                }
+            });
+
+            groups.sort((left, right) => {
+                const leftValue = Number(left.mainRow.dataset[sortValue] || 0);
+                const rightValue = Number(right.mainRow.dataset[sortValue] || 0);
+                if (leftValue !== rightValue) {
+                    return leftValue - rightValue;
+                }
+
+                return (left.mainRow.querySelector('td')?.textContent || '').localeCompare(right.mainRow.querySelector('td')?.textContent || '');
+            }).forEach(({mainRow, detailRow}) => {
+                tbody.appendChild(mainRow);
+                if (detailRow) {
+                    tbody.appendChild(detailRow);
+                }
+            });
+        };
+
+        [fieldFilter, statusFilter, sortBy].forEach((control) => {
+            if (!control) {
+                return;
+            }
+
+            control.addEventListener('change', applyControls);
+        });
+
+        if (resetButton) {
+            resetButton.addEventListener('click', () => {
+                if (fieldFilter) {
+                    fieldFilter.value = '';
+                }
+                if (statusFilter) {
+                    statusFilter.value = '';
+                }
+                if (sortBy) {
+                    sortBy.value = 'recommendedts';
+                }
+                applyControls();
+            });
+        }
+
+        applyControls();
+
+        container.querySelectorAll('.cdsp-review-toggle').forEach((button) => {
+            button.addEventListener('click', () => {
+                const target = button.dataset.target || '';
+                const mainRow = tbody.querySelector('.cdsp-review-group-main[data-group-id="' + target + '"]');
+                const detailRow = tbody.querySelector('.cdsp-review-group-detail[data-parent-id="' + target + '"]');
+                if (!mainRow || !detailRow || mainRow.style.display === 'none') {
+                    return;
+                }
+
+                const expanded = mainRow.dataset.expanded === '1';
+                mainRow.dataset.expanded = expanded ? '0' : '1';
+                detailRow.style.display = expanded ? 'none' : '';
+                button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                button.setAttribute('title', expanded ? 'Show' : 'Hide');
+                button.innerHTML = getToggleIconMarkup(!expanded);
+            });
+        });
+
+        const previewForm = container.querySelector('.coursedateshiftpro-preview form');
+        if (!previewForm) {
+            return;
+        }
+
+        previewForm.querySelectorAll('input[type="datetime-local"]').forEach((input) => {
+            const triggerRefresh = () => {
+                const root = getPreviewRoot();
+                if (!root) {
+                    return;
+                }
+
+                window.clearTimeout(refreshTimer);
+                refreshTimer = window.setTimeout(() => {
+                    requestPreviewRefresh(previewForm, root);
+                }, 350);
+            };
+            input.addEventListener('change', () => {
+                syncLinkedSuggestedDates(input, previewForm);
+                triggerRefresh();
+            });
+            input.addEventListener('blur', triggerRefresh);
+        });
+    };
+
+    const init = () => {
+        initPreviewUi(document);
+
+        document.addEventListener('click', (event) => {
+            const trigger = event.target.closest('button[type="submit"],input[type="submit"]');
+            if (!trigger || !trigger.form) {
+                return;
+            }
+
+            trigger.form.dataset.cdspSubmitter = trigger.name || '';
+        });
+
+        document.addEventListener('submit', async(event) => {
+            const form = event.target;
+            if (!(form instanceof HTMLFormElement)) {
+                return;
+            }
+
+            const actionname = getSubmitterName(event, form);
+            if (!PREVIEW_ACTIONS.has(actionname)) {
+                return;
+            }
+
+            const root = getPreviewRoot();
+            if (!root) {
+                return;
+            }
+
+            const payload = buildPayload(form);
+            if (!payload.courseid) {
+                return;
+            }
+
+            event.preventDefault();
+            const submitter = event.submitter || form.querySelector('[name="' + actionname + '"]');
+            setBusy(submitter, root, true);
+
+            try {
+                const response = await Repository.getPreview(payload);
+                root.innerHTML = response.html || '';
+                initPreviewUi(root);
+                root.scrollIntoView({behavior: 'smooth', block: 'start'});
+            } catch (error) {
+                Notification.exception(error);
+            } finally {
+                setBusy(submitter, root, false);
+            }
+        });
+    };
+
+    return {
+        init: init,
+    };
+});

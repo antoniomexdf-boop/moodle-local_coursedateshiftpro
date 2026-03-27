@@ -1,0 +1,717 @@
+.coursedateshiftpro-preview {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid var(--gray-300, #d8dee4);
+    border-radius: .75rem;
+    background: var(--white, #fff);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+}
+
+.cdsp-review-mode-switch {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: 0 0 1rem;
+}
+
+.cdsp-mode-button {
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.cdsp-mode-button.is-active {
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .05);
+}
+
+.cdsp-weekly-load {
+    margin: 0 0 1rem;
+    padding: 1rem;
+    border: 1px solid var(--gray-300, #d8dee4);
+    border-radius: .75rem;
+    background: #fbfcfe;
+}
+
+.cdsp-decision-panel {
+    margin: 0 0 1rem;
+    padding: 1rem;
+    border: 1px solid var(--gray-300, #d8dee4);
+    border-radius: .75rem;
+    background: linear-gradient(180deg, #fbfdff 0%, #f6f9fc 100%);
+}
+
+.cdsp-decision-panel__hero {
+    margin-bottom: 1rem;
+}
+
+.cdsp-decision-panel__eyebrow {
+    font-size: .74rem;
+    color: var(--gray-700, #4b5563);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+}
+
+.cdsp-decision-panel__headline {
+    margin: .2rem 0 .35rem;
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+.cdsp-decision-panel__message {
+    margin: 0;
+    color: var(--gray-700, #4b5563);
+}
+
+.cdsp-decision-panel__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .75rem;
+}
+
+.cdsp-decision-panel__card {
+    padding: .8rem .9rem;
+    border: 1px solid #e5e7eb;
+    border-radius: .65rem;
+    background: #fff;
+}
+
+.cdsp-decision-panel__label {
+    font-size: .72rem;
+    color: var(--gray-700, #4b5563);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 600;
+}
+
+.cdsp-decision-panel__value {
+    margin-top: .25rem;
+    font-size: .98rem;
+    font-weight: 700;
+}
+
+.cdsp-weekly-load__title {
+    margin: 0 0 .35rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.cdsp-weekly-load__help {
+    margin: 0 0 .85rem;
+    color: var(--gray-700, #4b5563);
+}
+
+.cdsp-weekly-load__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.cdsp-weekly-load__summary-card {
+    padding: .75rem .85rem;
+    border: 1px solid #e5e7eb;
+    border-radius: .65rem;
+    background: var(--white, #fff);
+}
+
+.cdsp-weekly-load__summary-label {
+    font-size: .72rem;
+    color: var(--gray-700, #4b5563);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 600;
+}
+
+.cdsp-weekly-load__summary-value {
+    margin-top: .2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.cdsp-weekly-load__table {
+    margin-bottom: 0;
+}
+
+.cdsp-weekly-load__details {
+    margin-top: .35rem;
+}
+
+.cdsp-weekly-load__details-summary {
+    cursor: pointer;
+    color: #0f6cbf;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.cdsp-weekly-load__details-help {
+    margin: .35rem 0 .15rem;
+    color: var(--gray-700, #4b5563);
+    font-size: .78rem;
+}
+
+.cdsp-weekly-load__list {
+    margin: .4rem 0 0 1rem;
+    padding: 0;
+}
+
+.cdsp-weekly-load__item-link {
+    color: #0f6cbf;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.cdsp-weekly-load__item-link:hover,
+.cdsp-weekly-load__item-link:focus {
+    text-decoration: underline;
+}
+
+.cdsp-week-item-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    color: #0f6cbf;
+}
+
+.cdsp-week-item-marker--end {
+    color: #b45309;
+}
+
+.cdsp-week-item-marker--single {
+    color: #047857;
+}
+
+.cdsp-load-badge {
+    font-weight: 600;
+    margin-top: .35rem;
+    display: inline-block;
+}
+
+.cdsp-load-badge--light {
+    background: #eaf7ed;
+    color: #1f6f3d;
+}
+
+.cdsp-load-badge--medium {
+    background: #fff7e6;
+    color: #9a6700;
+}
+
+.cdsp-load-badge--high {
+    background: #fdebec;
+    color: #b42318;
+}
+
+.cdsp-load-visual {
+    width: 100%;
+    height: .55rem;
+    border-radius: 999px;
+    background: #edf2f7;
+    overflow: hidden;
+}
+
+.cdsp-load-visual__bar {
+    height: 100%;
+    border-radius: 999px;
+}
+
+.cdsp-load-visual__bar--light {
+    background: #4caf72;
+}
+
+.cdsp-load-visual__bar--medium {
+    background: #f0a637;
+}
+
+.cdsp-load-visual__bar--high {
+    background: #e25b5b;
+}
+
+.cdsp-readiness {
+    margin: 0 0 1rem;
+    padding: 1rem;
+    border: 1px solid var(--gray-300, #d8dee4);
+    border-radius: .75rem;
+    background: #fff;
+}
+
+.cdsp-readiness__title {
+    margin: 0 0 .35rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.cdsp-readiness__help {
+    margin: 0 0 .85rem;
+    color: var(--gray-700, #4b5563);
+}
+
+.cdsp-readiness__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: .75rem;
+}
+
+.cdsp-readiness__card {
+    padding: .75rem .85rem;
+    border: 1px solid #e5e7eb;
+    border-radius: .65rem;
+    background: #f9fafb;
+}
+
+.cdsp-readiness__card.is-conflict {
+    background: #fff1f2;
+}
+
+.cdsp-readiness__card.is-review {
+    background: #fffaf1;
+}
+
+.cdsp-readiness__card.is-suggested {
+    background: #f5f9ff;
+}
+
+.cdsp-readiness__card.is-ready {
+    background: #f7fcf8;
+}
+
+.cdsp-readiness__label {
+    font-size: .72rem;
+    color: var(--gray-700, #4b5563);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 600;
+}
+
+.cdsp-readiness__value {
+    margin-top: .2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.coursedateshiftpro-preview__title {
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.coursedateshiftpro-preview__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.coursedateshiftpro-preview__card {
+    padding: .875rem 1rem;
+    border: 1px solid var(--gray-300, #d8dee4);
+    border-radius: .75rem;
+    background: var(--white, #fff);
+}
+
+.coursedateshiftpro-preview__card-label {
+    font-size: .73rem;
+    color: var(--gray-700, #4b5563);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 600;
+}
+
+.coursedateshiftpro-preview__card-value {
+    margin-top: .3rem;
+    font-size: .96rem;
+    font-weight: 600;
+}
+
+.coursedateshiftpro-preview__notice {
+    margin: 0 0 1rem;
+    padding: .9rem 1rem;
+    border-radius: .65rem;
+    border-left: 4px solid #b7791f;
+    background: #fff8e1;
+    color: #744210;
+}
+
+.coursedateshiftpro-preview__notice--success {
+    border-left-color: #2f855a;
+    background: #f0fff4;
+    color: #22543d;
+}
+
+.coursedateshiftpro-preview__timelines {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.coursedateshiftpro-timeline {
+    border: 1px solid var(--gray-300, #d8dee4);
+    border-radius: .75rem;
+    background: var(--white, #fff);
+    padding: .875rem;
+}
+
+.coursedateshiftpro-timeline__title {
+    margin: 0 0 .85rem;
+    font-size: .95rem;
+    font-weight: 700;
+}
+
+.coursedateshiftpro-timeline__scroll {
+    position: relative;
+    max-height: 520px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-left: 1.5rem;
+    padding-right: .5rem;
+}
+
+.coursedateshiftpro-timeline__line {
+    position: absolute;
+    left: .45rem;
+    top: .25rem;
+    bottom: .25rem;
+    width: 2px;
+    background: #d8dee4;
+}
+
+.coursedateshiftpro-timeline__entry {
+    position: relative;
+    margin-bottom: .9rem;
+}
+
+.coursedateshiftpro-timeline__dot {
+    position: absolute;
+    left: -1.2rem;
+    top: .45rem;
+    width: .65rem;
+    height: .65rem;
+    border-radius: 999px;
+    background: #0f6cbf;
+}
+
+.coursedateshiftpro-timeline__item {
+    font-weight: 600;
+    font-size: .86rem;
+}
+
+.coursedateshiftpro-timeline__field {
+    margin-top: .35rem;
+    padding-left: .1rem;
+}
+
+.coursedateshiftpro-timeline__field-label {
+    font-size: .73rem;
+    color: var(--gray-700, #4b5563);
+}
+
+.coursedateshiftpro-timeline__field-date {
+    font-size: .83rem;
+    margin-top: .12rem;
+}
+
+.cdsp-table-help {
+    margin: 0 0 .75rem;
+    color: var(--gray-700, #4b5563);
+}
+
+.cdsp-review-table-wrap {
+    border: 1px solid var(--gray-300, #d8dee4);
+    border-radius: .75rem;
+    background: var(--white, #fff);
+    overflow: hidden;
+}
+
+.cdsp-review-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    padding: .85rem 1rem;
+    border-bottom: 1px solid var(--gray-300, #d8dee4);
+    background: var(--gray-100, #f8f9fa);
+}
+
+.cdsp-review-control {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    min-width: 180px;
+}
+
+.cdsp-review-control__label {
+    font-size: .75rem;
+    color: var(--gray-700, #4b5563);
+    font-weight: 600;
+}
+
+.cdsp-review-table-wrap .generaltable th {
+    white-space: nowrap;
+}
+
+.cdsp-mode-simple .cdsp-review-table-wrap {
+    border-color: #dbe3ec;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+.cdsp-mode-simple #cdsp-review-table {
+    table-layout: fixed;
+}
+
+.cdsp-mode-simple .cdsp-advanced-only {
+    display: none;
+}
+
+.cdsp-mode-advanced .cdsp-simple-only {
+    display: none;
+}
+
+.cdsp-mode-simple .cdsp-advanced-only-cell {
+    display: none;
+}
+
+.cdsp-review-group-main td {
+    vertical-align: middle;
+}
+
+.cdsp-review-week {
+    width: 110px;
+}
+
+.cdsp-review-item {
+    font-weight: 600;
+}
+
+.cdsp-week-badge {
+    background: #eef4ff;
+    color: #1d4ed8;
+    font-weight: 700;
+}
+
+.cdsp-suggestion-reason {
+    margin-top: .25rem;
+    color: var(--gray-700, #4b5563);
+    font-size: .78rem;
+    font-weight: 500;
+}
+
+.cdsp-review-toggle.btn.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .35rem .45rem;
+    min-width: 2rem;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.cdsp-review-toggle.btn.btn-icon .icon,
+.coursedateshiftpro-history .btn.btn-icon .icon,
+.cdsp-week-item-marker .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    line-height: 1;
+}
+
+.cdsp-review-group-detail {
+    background: #f8fbff;
+}
+
+.cdsp-review-group-detail td {
+    padding: 0 1rem 1rem;
+}
+
+.cdsp-review-detail-table {
+    width: 100%;
+    margin-top: .75rem;
+    border-collapse: collapse;
+    background: var(--white, #fff);
+    border: 1px solid #e8edf3;
+    border-radius: .65rem;
+    overflow: hidden;
+}
+
+.cdsp-review-detail-table th {
+    text-align: left;
+    padding: .65rem .75rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: .75rem;
+}
+
+.cdsp-review-detail-table td {
+    padding: .65rem .75rem;
+    vertical-align: top;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.cdsp-date-compact {
+    white-space: nowrap;
+    font-size: .82rem;
+}
+
+.cdsp-form-actions {
+    margin-top: 1rem;
+}
+
+.cdsp-form-check {
+    display: block;
+    margin: 0 0 .75rem;
+    font-weight: 600;
+}
+
+.coursedateshiftpro-history {
+    margin-top: 1.5rem;
+    border: 1px solid var(--gray-300, #d8dee4);
+    border-radius: .75rem;
+    background: var(--white, #fff);
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.coursedateshiftpro-history__title {
+    margin: 0 0 .35rem;
+    font-size: 1.15rem;
+}
+
+.coursedateshiftpro-history__body {
+    padding: 0;
+}
+
+.coursedateshiftpro-history__description {
+    margin: 0 0 .875rem;
+    color: var(--gray-700, #4b5563);
+}
+
+.coursedateshiftpro-history__metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.coursedateshiftpro-history__metric {
+    padding: .8rem .9rem;
+    border: 1px solid #e5e7eb;
+    border-radius: .7rem;
+    background: #fbfcfd;
+}
+
+.coursedateshiftpro-history__metric-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--gray-700, #4b5563);
+    font-weight: 600;
+}
+
+.coursedateshiftpro-history__metric-value {
+    margin-top: .25rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.coursedateshiftpro-history__empty {
+    padding: .85rem 1rem;
+    border-radius: .5rem;
+    background: #f8f9fa;
+    color: var(--gray-700, #4b5563);
+}
+
+.coursedateshiftpro-history__actionform {
+    display: inline-block;
+    margin: 0 .35rem 0 0;
+}
+
+.coursedateshiftpro-history .btn.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 999px;
+    vertical-align: middle;
+}
+
+.coursedateshiftpro-history .btn.btn-icon .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.coursedateshiftpro-history__table {
+    margin-bottom: 0;
+}
+
+.coursedateshiftpro-history__impact-text {
+    margin-bottom: .35rem;
+    font-weight: 600;
+}
+
+.coursedateshiftpro-history__status {
+    font-weight: 600;
+}
+
+.coursedateshiftpro-history__details {
+    margin-top: .25rem;
+}
+
+.coursedateshiftpro-history__details-summary {
+    cursor: pointer;
+    color: #0f6cbf;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.coursedateshiftpro-history__details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: .65rem;
+    margin-top: .6rem;
+}
+
+.coursedateshiftpro-history__detail-card {
+    padding: .7rem .8rem;
+    border: 1px solid #e5e7eb;
+    border-radius: .65rem;
+    background: #fbfcfd;
+}
+
+.coursedateshiftpro-history__detail-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--gray-700, #4b5563);
+    font-weight: 600;
+}
+
+.coursedateshiftpro-history__detail-value {
+    margin-top: .2rem;
+    font-size: .95rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.coursedateshiftpro-history__loaded {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #bfdbfe;
+    border-radius: .75rem;
+    background: #f8fbff;
+}
+
+.coursedateshiftpro-history__loaded-title {
+    margin: 0 0 .65rem;
+}
+
+.coursedateshiftpro-history__loaded-row {
+    margin-bottom: .35rem;
+}
