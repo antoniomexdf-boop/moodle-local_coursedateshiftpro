@@ -25,7 +25,6 @@ Recommended GitHub repository name:
 - `README.md`
 - `CHANGELOG.md`
 - `MANUAL_EN.md`
-- `docs/release-notes-1.9.2.md`
 - `docs/screenshots/README.md`
 - `docs/screenshots/pro-1.9.2/README.md`
 

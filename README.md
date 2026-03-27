@@ -103,7 +103,6 @@ The ZIP itself must contain this plugin root:
 
 - [User manual](MANUAL_EN.md)
 - [Changelog](CHANGELOG.md)
-- [Release notes](docs/release-notes-1.9.2.md)
 - [Publication guide](docs/publication-guide.md)
 - [Screenshot set](docs/screenshots/pro-1.9.2/README.md)
 
