@@ -22,9 +22,10 @@ Recommended GitHub repository name:
 
 ## Documentation to Review
 
-- `coursedateshiftpro/README.md`
-- `coursedateshiftpro/CHANGELOG.md`
-- `coursedateshiftpro/MANUAL_EN.md`
+- `README.md`
+- `CHANGELOG.md`
+- `MANUAL_EN.md`
+- `docs/release-notes-1.9.2.md`
 - `docs/screenshots/README.md`
 - `docs/screenshots/pro-1.9.2/README.md`
 
@@ -36,8 +37,8 @@ The repository uses:
 
 The workflow runs Moodle Plugin CI with:
 
-- PHP 8.1, 8.2, 8.3
-- Moodle `MOODLE_405_STABLE`
+- PHP 7.4, 8.0, 8.1
+- Moodle `MOODLE_401_STABLE`
 - PostgreSQL and MariaDB
 
 ## Recommended Local Git Sequence
